@@ -1,20 +1,26 @@
 import csv
 from datetime import datetime
-
-def add_student():
-    try:
-        name = input("Enter student name: ")
-        with open("students.txt", "a") as file:
-            file.write(name + "\n")
-        print("Student added successfully!")
-    except Exception as e:
-        print("Error:", e)
+import os
 
 def mark_attendance():
     try:
+        if not os.path.exists("students.txt"):
+            print("No students file found. Add students first!")
+            return
+
         present = []
         with open("students.txt", "r") as file:
             students = file.readlines()
+
+        today = str(datetime.now().date())
+
+        # Read previous dates to avoid duplicate date entries
+        if os.path.exists("attendance.csv"):
+            with open("attendance.csv", "r") as file:
+                lines = file.readlines()
+                if any(today in line for line in lines):
+                    print(f"Attendance for {today} has already been marked!")
+                    return
 
         for s in students:
             status = input(f"Is {s.strip()} present? (y/n): ")
@@ -22,32 +28,10 @@ def mark_attendance():
 
         with open("attendance.csv", "a", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Date", datetime.now().date()])
+            writer.writerow(["Date", today])
             writer.writerows(present)
+
         print("Attendance marked successfully!")
-    except FileNotFoundError:
-        print("No students file found. Add students first!")
+
     except Exception as e:
         print("Error:", e)
-
-def view_report():
-    try:
-        with open("attendance.csv", "r") as file:
-            print(file.read())
-    except FileNotFoundError:
-        print("No attendance data found!")
-
-while True:
-    print("\n1. Add Student\n2. Mark Attendance\n3. View Attendance Report\n4. Exit")
-    choice = input("Enter choice: ")
-    
-    if choice == "1":
-        add_student()
-    elif choice == "2":
-        mark_attendance()
-    elif choice == "3":
-        view_report()
-    elif choice == "4":
-        break
-    else:
-        print("Invalid choice!")
