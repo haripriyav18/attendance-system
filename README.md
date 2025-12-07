@@ -1,31 +1,37 @@
-# Simple Student Attendance System
+import csv
+import os
 
-This is a simple Python-based attendance system that allows users to manage and track student attendance from the command line.
+# Create a folder to store attendance files
+if not os.path.exists("data"):
+    os.makedirs("data")
 
-## 📌 Features
-- Add new students
-- Mark attendance (Present / Absent)
-- View attendance records
-- Save attendance data to a file
+filename = "data/attendance.csv"
 
-## ▶️ How to Run
-1. Download or clone this repository
-2. Open a terminal in the project folder
-3. Run the command:
-python attendance.py
-## 📂 Project Structure
+# Add students
+students = {}
+n = int(input("Enter number of students: "))
+for i in range(n):
+    sid = input("Enter student ID: ")
+    name = input("Enter student name: ")
+    students[sid] = name
 
-attendance-system/
-│
-├── attendance.py      # Main program
-├── README.md          # Project documentation
-└── data/              # Folder to store attendance files (optional)
+# Mark attendance
+attendance = {}
+print("\nMark attendance (y for Present / n for Absent):")
+for sid, name in students.items():
+    status = input(f"{name} (ID: {sid}): ")
+    attendance[sid] = "Present" if status.lower() == 'y' else "Absent"
 
-## 🛠 Technologies Used
-- Python
+# Save attendance to CSV
+with open(filename, 'w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["Student ID", "Name", "Attendance"])
+    for sid in students:
+        writer.writerow([sid, students[sid], attendance[sid]])
 
-## ✨ Future Improvements
-- Add GUI (Tkinter)
-- Export attendance as CSV or Excel
-- Add student ID system
+print(f"\n✅ Attendance saved successfully in {filename}")
 
+# Optional: Show attendance summary
+print("\nAttendance Summary:")
+for sid in students:
+    print(f"{students[sid]}: {attendance[sid]}")
